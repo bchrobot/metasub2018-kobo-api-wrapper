@@ -7,8 +7,6 @@ router.get("/", (req,res,next) => {
   const username = "bwellington";
   const password = process.env.pw;
   const url = "https://kc.kobotoolbox.org/api/v1/data/102154?format=json";
-  //authenticationHeader also works?
-  //const authenticationHeader = "Basic " + new Buffer(username + ":" + password).toString("base64");
 
   request({
     url,
@@ -16,7 +14,6 @@ router.get("/", (req,res,next) => {
       user:username,
       pass:password
     }
-    //headers: {"Authorization": authenticationHeader}
   }, (err, response, body) => {
     if (err) throw err;
     res.send(body);
