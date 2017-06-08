@@ -3,10 +3,10 @@ const express = require("express");
 const router = express.Router();
 const request = require("request");
 
-router.get("/", (req,res,next) => {
+router.get("/:id", (req,res,next) => {
   const username = "bwellington";
   const password = process.env.pw;
-  const url = "https://kc.kobotoolbox.org/api/v1/data/102154?format=json";
+  const url = `https://kc.kobotoolbox.org/api/v1/data/${req.params.id}?format=json`;
 
   request({
     url,
