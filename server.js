@@ -13,7 +13,7 @@ if (env === "development"){
   dotenv.load();
 }
 
-
+//app.use(express.static("data"));
 
 app.use(routes);
 
