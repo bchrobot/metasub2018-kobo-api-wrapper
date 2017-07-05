@@ -27,8 +27,6 @@ const addPathsToCityList = rawData => {
 router.get("/", (req,res,next) => {
   const username = "bwellington";
   const password = process.env.pw;
-  //const cityListPath = "https://s3-us-west-2.amazonaws.com/metasub2017/data/cities.csv";
-  const cityListPath = "static/cities.csv";
   const getD3Json = id => {
     return d3.json(`https://kc.kobotoolbox.org/api/v1/data/${id}?format=json`)
       .user(username)
@@ -36,17 +34,10 @@ router.get("/", (req,res,next) => {
     };
 
   fs.readFile("./data/cities.csv", "utf8", (err,data) => {
-    loadAndSendKoboData(d3.csvParse(data));
+    loadKoboData(d3.csvParse(data));
   });
 
-  // d3.csv(cityListPath, (error, cityList) => {
-  //   if (error) throw error;
-  //   console.log(error);
-  //   console.log(cityList);
-  //   loadAndSendKoboData(cityList);
-  // });
-
-  function loadAndSendKoboData(cityList){
+  function loadKoboData(cityList){
     const q = d3.queue();
     const cityListWithPaths = addPathsToCityList(cityList);
     cityListWithPaths.filter(d => d.live)
@@ -67,9 +58,16 @@ router.get("/", (req,res,next) => {
         }
         return cityWithFeatures;
       });
-      res.send(cityListWithFeatures);
+      loadMetadata(cityListWithFeatures);
+      //res.send(cityListWithFeatures);
     });
-  };
+  }
+
+  function loadMetadata(cityListWithFeatures){
+    fs.readFile("./data/metadata.csv", "utf8", (err,data) => {
+      res.send({citiesData: cityListWithFeatures, metadata: d3.csvParse(data)});
+    });
+  }
 });
 
 module.exports = router;
