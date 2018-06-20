@@ -3,6 +3,9 @@ const d3 = require("d3");
 const router = express.Router();
 const request = require("request");
 const fs = require("fs");
+const _ = require("underscore");
+
+const fixedKeys = ['end', '_geolocation', '_attachments', '_id'];
 
 const addPathsToCityList = rawData => {
   const cityListWithPaths = rawData.map(rawCity => {
@@ -20,13 +23,9 @@ const addPathsToCityList = rawData => {
   return cityListWithPaths;
 };
 
-
-
-
-
 router.get("/", (req,res,next) => {
   const username = "bwellington";
-  const password = process.env.pw;
+  const password = 'MetaSUB!1122';
   const getD3Json = id => {
     return d3.json(`https://kc.kobotoolbox.org/api/v1/data/${id}?format=json`)
       .user(username)
@@ -65,7 +64,16 @@ router.get("/", (req,res,next) => {
 
   function loadMetadata(cityListWithFeatures){
     fs.readFile("./data/metadata.csv", "utf8", (err,data) => {
-      res.send({citiesData: cityListWithFeatures, metadata: d3.csvParse(data)});
+      let metadata = d3.csvParse(data);
+      let keys = _.uniq(_.map(metadata, m => m.category)).concat(fixedKeys);
+      let filteredData = _.map(cityListWithFeatures, c => {
+        c.features = _.map(c.features, f => {
+          f = _.pick(f, keys);
+          return f;
+        });
+        return c;
+      });
+      res.send({citiesData: filteredData, metadata: metadata});
     });
   }
 });
