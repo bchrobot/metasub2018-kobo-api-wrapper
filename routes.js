@@ -23,7 +23,7 @@ const addPathsToCityList = rawData => {
   return cityListWithPaths;
 };
 
-router.get("/", (req,res,next) => {
+router.get("/:year?", (req,res,next) => {
   const username = "bwellington";
   const password = 'MetaSUB!1122';
   const getD3Json = id => {
@@ -67,6 +67,10 @@ router.get("/", (req,res,next) => {
       let metadata = d3.csvParse(data);
       let keys = _.uniq(_.map(metadata, m => m.category)).concat(fixedKeys);
       let filteredData = _.map(cityListWithFeatures, c => {
+        if (req.params.year) {
+          let reg = new RegExp(`^${req.params.year}`);
+          c.features = _.filter(c.features, f => f.end && f.end.match(reg));
+        }
         c.features = _.map(c.features, f => {
           f = _.pick(f, keys);
           return f;
