@@ -2,11 +2,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const cors = require("cors");
-
+const compression = require('compression');
 const routes = require("./routes");
 
 const app = express();
 app.use(cors());
+app.use(compression());
 const env = process.env.NODE_ENV || "development";
 
 if (env === "development"){
