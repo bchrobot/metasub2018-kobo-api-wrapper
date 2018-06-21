@@ -12,10 +12,8 @@ const addPathsToCityList = rawData => {
     const cityWithPath = Object.assign({}, rawCity);
     if (cityWithPath.id !== ""){
       cityWithPath.path = `https://kc.kobotoolbox.org/api/v1/data/${cityWithPath.id}?format=json`;
-      cityWithPath.live = true;
-    }else{
-      cityWithPath.live = false;
     }
+    cityWithPath.live = true;
     cityWithPath.lat = parseFloat(cityWithPath.lat);
     cityWithPath.lon = parseFloat(cityWithPath.lon);
     return cityWithPath;
@@ -27,7 +25,9 @@ router.get("/:year?", (req,res,next) => {
   const username = "gcsd_export";
   const password = 'lonGpasswordfOrMETASUBgcs18d';
   const getD3Json = id => {
-    return d3.json(`https://kc.kobotoolbox.org/api/v1/data/${id}?format=json`)
+    const urlSafeId = id || 'null';
+    return d3.json(`https://kc.kobotoolbox.org/api/v1/data/${urlSafeId}?format=json`)
+      .on('error', (err) => [])
       .user(username)
       .password(password);
     };
@@ -39,8 +39,7 @@ router.get("/:year?", (req,res,next) => {
   function loadKoboData(cityList){
     const q = d3.queue();
     const cityListWithPaths = addPathsToCityList(cityList);
-    cityListWithPaths.filter(d => d.live)
-      .map(d => getD3Json(d.id))
+    cityListWithPaths.map(d => getD3Json(d.id))
       .forEach(d => {
         q.defer(d.get);
       });
@@ -58,7 +57,6 @@ router.get("/:year?", (req,res,next) => {
         return cityWithFeatures;
       });
       loadMetadata(cityListWithFeatures);
-      //res.send(cityListWithFeatures);
     });
   }
 
