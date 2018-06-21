@@ -24,8 +24,8 @@ const addPathsToCityList = rawData => {
 };
 
 router.get("/:year?", (req,res,next) => {
-  const username = "bwellington";
-  const password = 'MetaSUB!1122';
+  const username = "gcsd_export";
+  const password = 'lonGpasswordfOrMETASUBgcs18d';
   const getD3Json = id => {
     return d3.json(`https://kc.kobotoolbox.org/api/v1/data/${id}?format=json`)
       .user(username)
