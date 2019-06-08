@@ -3,7 +3,7 @@ require("dotenv").load();
 const express = require("express");
 const cors = require("cors");
 const compression = require("compression");
-const routes = require("./routes");
+const routes = require("./src/routes");
 
 const app = express();
 app.use(cors());
