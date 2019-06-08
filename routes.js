@@ -30,7 +30,10 @@ router.get("/:year?", (req, res, next) => {
     const urlSafeId = id || "null";
     return d3
       .json(`https://kc.kobotoolbox.org/api/v1/data/${urlSafeId}?format=json`)
-      .on("error", err => [])
+      .on("error", err => {
+        console.error(err);
+        return [];
+      })
       .user(username)
       .password(password);
   };
