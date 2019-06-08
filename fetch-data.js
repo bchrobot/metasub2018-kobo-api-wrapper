@@ -1,11 +1,11 @@
+require("dotenv").config();
+
 const d3 = require("d3");
 const superagent = require("superagent");
 const _ = require("underscore");
 const { readFile } = require("./util");
 
-const KOBO_USERNAME = "gcsd_export";
-const KOBO_PASSWORD = "lonGpasswordfOrMETASUBgcs18d";
-
+const { KOBO_USERNAME, KOBO_PASSWORD } = process.env;
 const FIXED_KEYS = ["end", "_geolocation", "_attachments", "_id"];
 
 let _metadata = undefined;
@@ -41,7 +41,11 @@ const fetchCityFeatures = async cityId => {
     .auth(KOBO_USERNAME, KOBO_PASSWORD)
     .then(res => res.body)
     .catch(err => {
-      console.error(err);
+      console.error(
+        `Error fetching features from Kobo Toolbox for city ID ${cityId}: '${
+          err.message
+        }'`
+      );
       return [];
     });
 };
@@ -51,26 +55,36 @@ const doesFeatureMatchYear = year => feature => {
   return feature.end && feature.end.match(regEx);
 };
 
-const hydratedCity = async (city, year) => {
+const hydratedCity = city => {
+  const newFields = {
+    live: true,
+    lat: parseFloat(city.lat),
+    lon: parseFloat(city.lon),
+    features: []
+  };
+  return Object.assign({}, city, newFields);
+};
+
+const cityWithFeatures = async (city, year) => {
   const keys = await getKeys();
-  let features = await fetchCityFeatures(city.id)
+  const features = await fetchCityFeatures(city.id)
     .then(features => {
       if (!year) return features;
       return features.filter(doesFeatureMatchYear(year));
     })
     .then(features => features.map(feature => _.pick(feature, keys)));
-  const newFields = {
-    live: true,
-    lat: parseFloat(city.lat),
-    lon: parseFloat(city.lon),
-    features
-  };
-  return Object.assign({}, city, newFields);
+  return Object.assign({}, city, { features });
 };
 
 const getCitiesData = async year => {
-  const rawCities = await getRawCities();
-  return Promise.all(rawCities.map(city => hydratedCity(city, year)));
+  const cities = (await getRawCities()).map(hydratedCity);
+
+  if (!(KOBO_USERNAME && KOBO_PASSWORD)) {
+    console.error("Kobo username or password was not provided!");
+    return cities;
+  }
+
+  return Promise.all(cities.map(city => cityWithFeatures(city, year)));
 };
 
 module.exports = {
