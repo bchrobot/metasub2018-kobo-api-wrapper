@@ -5,13 +5,15 @@ const request = require("request");
 const fs = require("fs");
 const _ = require("underscore");
 
-const fixedKeys = ['end', '_geolocation', '_attachments', '_id'];
+const fixedKeys = ["end", "_geolocation", "_attachments", "_id"];
 
 const addPathsToCityList = rawData => {
   const cityListWithPaths = rawData.map(rawCity => {
     const cityWithPath = Object.assign({}, rawCity);
-    if (cityWithPath.id !== ""){
-      cityWithPath.path = `https://kc.kobotoolbox.org/api/v1/data/${cityWithPath.id}?format=json`;
+    if (cityWithPath.id !== "") {
+      cityWithPath.path = `https://kc.kobotoolbox.org/api/v1/data/${
+        cityWithPath.id
+      }?format=json`;
     }
     cityWithPath.live = true;
     cityWithPath.lat = parseFloat(cityWithPath.lat);
@@ -21,25 +23,27 @@ const addPathsToCityList = rawData => {
   return cityListWithPaths;
 };
 
-router.get("/:year?", (req,res,next) => {
+router.get("/:year?", (req, res, next) => {
   const username = "gcsd_export";
-  const password = 'lonGpasswordfOrMETASUBgcs18d';
+  const password = "lonGpasswordfOrMETASUBgcs18d";
   const getD3Json = id => {
-    const urlSafeId = id || 'null';
-    return d3.json(`https://kc.kobotoolbox.org/api/v1/data/${urlSafeId}?format=json`)
-      .on('error', (err) => [])
+    const urlSafeId = id || "null";
+    return d3
+      .json(`https://kc.kobotoolbox.org/api/v1/data/${urlSafeId}?format=json`)
+      .on("error", err => [])
       .user(username)
       .password(password);
-    };
+  };
 
-  fs.readFile("./data/cities.csv", "utf8", (err,data) => {
+  fs.readFile("./data/cities.csv", "utf8", (err, data) => {
     loadKoboData(d3.csvParse(data));
   });
 
-  function loadKoboData(cityList){
+  function loadKoboData(cityList) {
     const q = d3.queue();
     const cityListWithPaths = addPathsToCityList(cityList);
-    cityListWithPaths.map(d => getD3Json(d.id))
+    cityListWithPaths
+      .map(d => getD3Json(d.id))
       .forEach(d => {
         q.defer(d.get);
       });
@@ -50,7 +54,7 @@ router.get("/:year?", (req,res,next) => {
       let dataAdded = 0;
       const cityListWithFeatures = cityListWithPaths.map((city, i) => {
         const cityWithFeatures = Object.assign({}, city);
-        if (cityWithFeatures.live){
+        if (cityWithFeatures.live) {
           cityWithFeatures.features = samples[dataAdded];
           dataAdded++;
         }
@@ -60,8 +64,8 @@ router.get("/:year?", (req,res,next) => {
     });
   }
 
-  function loadMetadata(cityListWithFeatures){
-    fs.readFile("./data/metadata.csv", "utf8", (err,data) => {
+  function loadMetadata(cityListWithFeatures) {
+    fs.readFile("./data/metadata.csv", "utf8", (err, data) => {
       let metadata = d3.csvParse(data);
       let keys = _.uniq(_.map(metadata, m => m.category)).concat(fixedKeys);
       let filteredData = _.map(cityListWithFeatures, c => {
@@ -75,7 +79,7 @@ router.get("/:year?", (req,res,next) => {
         });
         return c;
       });
-      res.send({citiesData: filteredData, metadata: metadata});
+      res.send({ citiesData: filteredData, metadata: metadata });
     });
   }
 });
