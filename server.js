@@ -1,5 +1,4 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const compression = require("compression");
@@ -14,8 +13,6 @@ if (env === "development") {
   dotenv.load();
 }
 
-//app.use(express.static("data"));
-
 app.use(routes);
 
 app.use((err, req, res, next) => {
@@ -24,5 +21,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(process.env.PORT || 3000, function() {
-  console.log("EXAMPLE APP");
+  console.log("MetaSUB Kobo API Wrapper - 2018");
 });
