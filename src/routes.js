@@ -7,9 +7,10 @@ var cache = require('memory-cache');
 
 router.get("/:year?", async (req, res, next) => {
   const { year } = req.params;
+  console.log(year);
   if (year === '2019'){
-      let metadata = cache.get(year + '_metadata')
-      let citiesData = cache.get(year + '_cities')
+      let metadata = cache.get(year + '_metadata');
+      let citiesData = cache.get(year + '_cities');
       if (metadata) {
           return res.send({ metadata, citiesData });
       }
@@ -20,8 +21,8 @@ router.get("/:year?", async (req, res, next) => {
       return res.send({ metadata, citiesData });
 
   } else {
-      let metadata = cache.get(year + '_metadata')
-      let citiesData = cache.get(year + '_cities')
+      let metadata = cache.get(year + '_metadata');
+      let citiesData = cache.get(year + '_cities');
       if (metadata) {
           return res.send({ metadata, citiesData });
       }
