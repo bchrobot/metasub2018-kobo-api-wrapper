@@ -38,6 +38,7 @@ const fetchCityFeatures = async cityId => {
 
   return superagent
     .get(`https://kc.kobotoolbox.org/api/v1/data/${cityId}?format=json`)
+    .timeout(60 * 10 * 1000)
     .auth(KOBO_USERNAME, KOBO_PASSWORD)
     .then(res => res.body)
     .catch(err => {
