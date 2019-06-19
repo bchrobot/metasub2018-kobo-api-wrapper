@@ -14,8 +14,8 @@ router.get("/:year?", async (req, res, next) => {
       if (metadata) {
           return res.send({ metadata, citiesData });
       }
-      const metadata = await getMetadata();
-      const citiesData = await getCitiesData(year);
+      metadata = await getMetadata();
+      citiesData = await getCitiesData(year);
       cache.put(year + '_metadata', metadata, 1000 * 60 * 5);
       cache.put(year + '_cities', citiesData, 1000 * 60 * 5);
       return res.send({ metadata, citiesData });
@@ -26,8 +26,8 @@ router.get("/:year?", async (req, res, next) => {
       if (metadata) {
           return res.send({ metadata, citiesData });
       }
-      const metadata = await getMetadata();
-      const citiesData = await getCitiesData(year);
+      metadata = await getMetadata();
+      citiesData = await getCitiesData(year);
       cache.put(year + '_metadata', metadata, 1000 * 60 * 60 * 24);
       cache.put(year + '_cities', citiesData, 1000 * 60 * 60 * 24);
       return res.send({ metadata, citiesData });
