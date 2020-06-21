@@ -28,8 +28,8 @@ router.get("/:year?", async (req, res, next) => {
       }
       metadata = await getMetadata();
       citiesData = await getCitiesData(year);
-      cache.put(year + '_metadata', metadata, 1000 * 60 * 60 * 24);
-      cache.put(year + '_cities', citiesData, 1000 * 60 * 60 * 24);
+      cache.put(year + '_metadata', metadata, 1000 * 60 * 15);
+      cache.put(year + '_cities', citiesData, 1000 * 60 * 15);
       return res.send({ metadata, citiesData });
   }
 
